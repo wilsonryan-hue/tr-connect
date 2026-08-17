@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>TR Site</title>
+  <style>
+    html,body{margin:0;min-height:100%;background:#0a0a0a;color:#f3f0e6;font-family:Georgia,"Palatino Linotype",serif}
+    main{min-height:100vh;display:grid;place-items:center;padding:2rem;text-align:center}
+    h1{color:#d4af37;font-weight:500}
+    p{color:#9a9588}
+    a{color:#d4af37}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Treun Roc · Site</h1>
+  <p id="msg">Opening the site phone app…</p>
+  <p><a id="fallback" href="#">Open manually</a></p>
+</main>
+<script>
+  async function go() {
+    let url = "";
+    try {
+      const r = await fetch("live.json?t=" + Date.now(), { cache: "no-store" });
+      const j = await r.json();
+      if (j && j.url) url = j.url.replace(/\/?$/, "/");
+    } catch (e) {}
+    const dest = url ? url + "login?next=/site" : "#";
+    document.getElementById("fallback").href = dest;
+    if (url) window.location.replace(dest);
+    else document.getElementById("msg").textContent = "Try again in a minute.";
+  }
+  go();
+</script>
+</body>
+</html>

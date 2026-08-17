@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Treun Roc Connect</title>
   <style>
     html,body{margin:0;min-height:100%;background:#0a0a0a;color:#f3f0e6;font-family:Georgia,"Palatino Linotype",serif}
@@ -24,17 +24,20 @@
   </div>
 </main>
 <script>
+  const extra = location.search || "";
+  const hash = location.hash || "";
   async function go() {
     let url = "";
     try {
       const r = await fetch("live.json?t=" + Date.now(), { cache: "no-store" });
       const j = await r.json();
-      if (j && j.url) url = j.url;
+      if (j && j.url) url = j.url.replace(/\/?$/, "/");
     } catch (e) {}
     const a = document.getElementById("fallback");
     if (url) {
-      a.href = url;
-      window.location.replace(url);
+      const dest = url.replace(/\/?$/, "/") + extra.replace(/^\?/, "?") + hash;
+      a.href = dest;
+      window.location.replace(dest);
     } else {
       document.getElementById("msg").textContent = "The door is up. The live desk is waking — try again in a minute.";
     }
