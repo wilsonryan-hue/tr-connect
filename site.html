@@ -7,15 +7,15 @@
   <style>
     html,body{margin:0;min-height:100%;background:#0a0a0a;color:#f3f0e6;font-family:Georgia,"Palatino Linotype",serif}
     main{min-height:100vh;display:grid;place-items:center;padding:2rem;text-align:center}
-    h1{color:#d4af37;font-weight:500}
-    p{color:#9a9588}
+    .mark{width:72px;height:72px;margin:0 auto 1rem;border-radius:8px;background:#121212;border:1px solid #2a2a2a;display:grid;place-items:center;color:#d4af37;letter-spacing:.2em;font-size:.7rem}
     a{color:#d4af37}
   </style>
 </head>
 <body>
 <main>
-  <h1>Treun Roc · Site</h1>
-  <p id="msg">Opening the site phone app…</p>
+  <div class="mark">TR</div>
+  <h1>Site phone</h1>
+  <p id="msg">Opening Treun Roc Site…</p>
   <p><a id="fallback" href="#">Open manually</a></p>
 </main>
 <script>
@@ -26,10 +26,14 @@
       const j = await r.json();
       if (j && j.url) url = j.url.replace(/\/?$/, "/");
     } catch (e) {}
-    const dest = url ? url + "login?next=/site" : "#";
-    document.getElementById("fallback").href = dest;
-    if (url) window.location.replace(dest);
-    else document.getElementById("msg").textContent = "Try again in a minute.";
+    const a = document.getElementById("fallback");
+    if (url) {
+      const dest = url + "login?next=/site";
+      a.href = dest;
+      window.location.replace(dest);
+    } else {
+      document.getElementById("msg").textContent = "Try again in a minute.";
+    }
   }
   go();
 </script>
