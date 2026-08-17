@@ -14,12 +14,12 @@
 <main>
   <div class="mark">TR</div>
   <h1>Site phone</h1>
-  <p>Opening Treun Roc sign-in…</p>
+  <p>Opening the site phone…</p>
 </main>
 <script>
   const as = new URLSearchParams(location.search).get("as");
-  const q = as ? "&as=" + encodeURIComponent(as) : "";
-  location.replace("./#/login?next=/site" + q);
+  const q = as ? "?as=" + encodeURIComponent(as) : "";
+  location.replace("./#/site" + q);
 </script>
 </body>
 </html>
