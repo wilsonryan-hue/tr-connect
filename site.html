@@ -27,8 +27,9 @@
       if (j && j.url) url = j.url.replace(/\/?$/, "/");
     } catch (e) {}
     const a = document.getElementById("fallback");
+    const as = new URLSearchParams(location.search).get("as");
     if (url) {
-      const dest = url + "login?next=/site";
+      const dest = url + "login?next=/site" + (as ? "&as=" + encodeURIComponent(as) : "");
       a.href = dest;
       window.location.replace(dest);
     } else {
