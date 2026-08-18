@@ -1,4 +1,11 @@
 {
   "v": 1,
-  "book": {}
+  "book": {
+    "admin": null,
+    "staff": null
+  },
+  "passwordReset": {
+    "required": true,
+    "resetCode": "INITIAL_SETUP_2026"
+  }
 }
