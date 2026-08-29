@@ -1,7 +1,13 @@
-# Treun Roc Connect — permanent door
+# Treun Roc Connect — door
 
-This address never changes:
+**Use this and only this:**
 
-**https://wilsonryan-hue.github.io/tr-connect/**
+https://wilsonryan-hue.github.io/tr-connect/
 
-`live.json` is updated whenever the live desk moves. Sign in with your `@treunroc.com` email.
+Sign in with your name. First time on a phone or laptop, set your own password. It stays on that device.
+
+The old Grok sandbox in live.json was dead (HTTP 500) on 29 Aug 2026. live.json now points here.
+
+Practice drill (safe test job): https://wilsonryan-hue.github.io/tr-connect/practice.html
+
+Do not send staff to any `grok-sandbox` or `localhost` link.
