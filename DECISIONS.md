@@ -27,3 +27,8 @@
 - Boot landing: TR logo + tech MI visuals.
 - Primary staff URL: https://wilsonryan-hue.github.io/tr-connect/ (not tchworks).
 - connect.treunroccontracts.com stays pending until dig DNS_OK; no CNAME file on Pages until then.
+
+## 2026-09-09 — MD GO: Pages custom domain
+- DNS_OK: connect.treunroccontracts.com CNAME → wilsonryan-hue.github.io
+- Attach Pages custom domain connect.treunroccontracts.com
+- Keep LOGIN_OK door; no live-state dump

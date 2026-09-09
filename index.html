@@ -200,7 +200,7 @@
         <button type="submit" id="boot-submit">Enter desk</button>
         <button type="button" id="boot-forgot">Forgot — set a new password</button>
         <p class="hint">Staff names are not listed on this door.</p>
-        <div class="door-url">Door: <strong id="door-host">wilsonryan-hue.github.io/tr-connect</strong></div>
+        <div class="door-url">Door: <strong id="door-host">connect.treunroccontracts.com</strong></div>
       </form>
     </div>
     <script>
@@ -216,7 +216,7 @@
   if (door) {
     var host = location.host + location.pathname.replace(/\/$/, '');
     if (/tchworks\.co\.uk/i.test(host)) {
-      door.textContent = 'wilsonryan-hue.github.io/tr-connect';
+      door.textContent = 'connect.treunroccontracts.com';
     } else {
       door.textContent = host.replace(/^www\./, '');
     }
