@@ -9,3 +9,11 @@
 - Published snapshot stores data on the device. Shared book is the next engineering job after the door stays up.
 - Do not start a new Connect repo.
 - TCH Works and IntuiTune wait until Connect is usable day to day.
+
+## 2026-09-09 — MD HARD LOCK (door)
+- Public Pages under www.tchworks.co.uk/tr-connect/ stays closed-door HTML only.
+- NEVER publish assets/index-*.js, live-state.json, or staff-auth.json until server /api/staff-auth is live AND MD GO.
+- Reopen 2bcba83 (Treun Roc Connect / ryan@treunroc.com) was unauthorized; re-closed 6705617.
+- CI door-guard in .github/workflows/pages.yml rejects SPA/ops dumps.
+- Custom domain connect.treunroccontracts.com: CNAME Host=connect Value=wilsonryan-hue.github.io when Namecheap allows — domain attach only.
+- CI workflow edit blocked: gh OAuth token lacks `workflow` scope. Guard script at scripts/door-lock-check.sh until a token/user with workflow scope updates .github/workflows/pages.yml.
