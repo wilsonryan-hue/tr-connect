@@ -14,6 +14,6 @@
 - Public Pages under www.tchworks.co.uk/tr-connect/ stays closed-door HTML only.
 - NEVER publish assets/index-*.js, live-state.json, or staff-auth.json until server /api/staff-auth is live AND MD GO.
 - Reopen 2bcba83 (Treun Roc Connect / ryan@treunroc.com) was unauthorized; re-closed 6705617.
-- CI door-guard in .github/workflows/pages.yml rejects SPA/ops dumps.
+- Door-guard script: scripts/door-lock-check.sh (pages.yml CI step blocked until a credential with `workflow` scope updates the Actions workflow).
 - Custom domain connect.treunroccontracts.com: CNAME Host=connect Value=wilsonryan-hue.github.io when Namecheap allows — domain attach only.
 - CI workflow edit blocked: gh OAuth token lacks `workflow` scope. Guard script at scripts/door-lock-check.sh until a token/user with workflow scope updates .github/workflows/pages.yml.
