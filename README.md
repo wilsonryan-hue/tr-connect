@@ -1,13 +1,28 @@
-# Treun Roc Connect — door
+# Treun Roc Connect — staff door
 
-**Use this and only this:**
+This repo is **Treun Roc Connect only**. It is not TCH Works.
+
+## Use this address
+
+https://www.tchworks.co.uk/tr-connect/
+
+That URL looks like TCH because the GitHub user site (`wilsonryan-hue.github.io`) has a custom domain of `tchworks.co.uk`. GitHub then puts **every** project page under that domain. The folder `/tr-connect/` is still this repo. The shop lives at the root: https://www.tchworks.co.uk/
+
+Same files also exist at:
 
 https://wilsonryan-hue.github.io/tr-connect/
 
-Sign in with your name. First time on a phone or laptop, set your own password. It stays on that device.
+GitHub 301s that to the TCH host. Ignore the host name. If the page says **Treun Roc Connect**, you are in the right product.
 
-The old Grok sandbox in live.json was dead (HTTP 500) on 29 Aug 2026. live.json now points here.
+## Sign in
 
-Practice drill (safe test job): https://wilsonryan-hue.github.io/tr-connect/practice.html
+Office: tap your name on the Office tab.
+Site: use https://www.tchworks.co.uk/tr-connect/site.html
 
-Do not send staff to any `grok-sandbox` or `localhost` link.
+First time on a device, the password you type is saved on that device. Marlon can enter with the password already set.
+
+## Do not use
+
+- Any `grok-sandbox` URL
+- The TCH shop root as a staff login
+- localhost

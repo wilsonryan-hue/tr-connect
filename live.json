@@ -1,6 +1,8 @@
 {
-  "url": "https://wilsonryan-hue.github.io/tr-connect/",
-  "updated": "2026-08-29T13:35:00Z",
   "app": "Treun Roc Connect",
-  "note": "Do not point this at Grok sandboxes. They die. This Pages URL is the door."
+  "url": "https://www.tchworks.co.uk/tr-connect/",
+  "also": "https://wilsonryan-hue.github.io/tr-connect/",
+  "site": "https://www.tchworks.co.uk/tr-connect/site.html",
+  "updated": "2026-09-09T08:00:00Z",
+  "note": "Not TCH Works. TCH shop is the domain root. This folder is the Treun Roc staff desk. Do not point at Grok sandboxes."
 }
