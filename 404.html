@@ -77,7 +77,7 @@
         border-radius: 10px; border: 1px solid var(--line);
         background: #0a0a0a; box-shadow: 0 0 24px var(--glow);
       }
-      .hero-logo { display:block; width:min(220px, 55vw); height:auto; margin:18px 0 8px; filter: drop-shadow(0 0 24px rgba(201,162,39,0.25)); }
+      .hero-logo { display:block; width:min(200px, 48vw); height:auto; aspect-ratio:1; margin:16px 0 10px; border-radius:14px; border:1px solid var(--line); background:#000; box-shadow:0 0 28px var(--glow); }
       .brand .tag {
         font-family: "IBM Plex Mono", monospace;
         font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
@@ -169,17 +169,17 @@
       <section class="hero">
         <div class="brand">
           <img src="./tr-mark-256.png" width="48" height="48" alt="Treun Roc" />
-          <div class="tag">Treun Roc Connect</div>
+          <div class="tag">Staff access</div>
         </div>
-        <img class="hero-logo" src="./tr-logo-hero.jpg" alt="Treun Roc Contracts" />
-        <h1>Operations intelligence for the live job book.</h1>
+        <img class="hero-logo" src="./tr-logo.png" alt="Treun Roc Contracts" width="220" height="220" />
+        <h1>Treun Roc Connect</h1>
         <p class="lede">
-          A sharp desk for quotes, site progress, hours, and margin — built for contractors who run on signal, not spreadsheets.
+          Office and site tools for live contracts — tenders, hours, receipts, progress photos, and invoices in one place.
         </p>
         <div class="hero-metrics" aria-hidden="true">
-          <div class="metric"><div class="k">Live margin</div><div class="v">Job → bank</div></div>
-          <div class="metric"><div class="k">Site phone</div><div class="v">Hours · photos</div></div>
-          <div class="metric"><div class="k">Office desk</div><div class="v">Tenders · apps</div></div>
+          <div class="metric"><div class="k">Office</div><div class="v">Tenders · invoices</div></div>
+          <div class="metric"><div class="k">Site</div><div class="v">Hours · photos</div></div>
+          <div class="metric"><div class="k">Jobs</div><div class="v">Live progress</div></div>
         </div>
       </section>
       <form id="boot-card" autocomplete="on">
