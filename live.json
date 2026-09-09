@@ -1,6 +1,7 @@
 {
   "app": "Treun Roc Connect",
-  "url": "https://www.tchworks.co.uk/tr-connect/",
-  "updated": "2026-09-09T20:00:00Z",
-  "note": "Staff desk login restored by Ryan order. No live-state dump on Pages."
+  "url": "https://wilsonryan-hue.github.io/tr-connect/",
+  "custom_domain_pending": "https://connect.treunroccontracts.com/",
+  "updated": "2026-09-09T20:45:00Z",
+  "note": "Primary door is github.io. tchworks path is legacy hosting only. TR logo + tech MI boot landing."
 }

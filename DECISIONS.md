@@ -22,3 +22,8 @@
 - Ryan ordered staff login working immediately (closed-door HTML removed).
 - Restored desk SPA from 2bcba83 (no live-state.json).
 - Server /api/staff-auth still not live; device/local login path as in that build.
+
+## 2026-09-09 — Door brand + URL
+- Boot landing: TR logo + tech MI visuals.
+- Primary staff URL: https://wilsonryan-hue.github.io/tr-connect/ (not tchworks).
+- connect.treunroccontracts.com stays pending until dig DNS_OK; no CNAME file on Pages until then.
