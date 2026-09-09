@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="TR Connect" />
     <title>Treun Roc Connect</title>
-    <link rel="icon" href="./tr-logo.svg" />
+    <link rel="icon" href="./tr-mark-256.png" />
     <link rel="apple-touch-icon" href="./icon-180.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -77,6 +77,7 @@
         border-radius: 10px; border: 1px solid var(--line);
         background: #0a0a0a; box-shadow: 0 0 24px var(--glow);
       }
+      .hero-logo { display:block; width:min(220px, 55vw); height:auto; margin:18px 0 8px; filter: drop-shadow(0 0 24px rgba(201,162,39,0.25)); }
       .brand .tag {
         font-family: "IBM Plex Mono", monospace;
         font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
@@ -167,9 +168,10 @@
     <div id="boot" class="hidden" aria-live="polite">
       <section class="hero">
         <div class="brand">
-          <img src="./tr-logo.svg" width="44" height="44" alt="Treun Roc" />
+          <img src="./tr-mark-256.png" width="48" height="48" alt="Treun Roc" />
           <div class="tag">Treun Roc Connect</div>
         </div>
+        <img class="hero-logo" src="./tr-logo-hero.jpg" alt="Treun Roc Contracts" />
         <h1>Operations intelligence for the live job book.</h1>
         <p class="lede">
           A sharp desk for quotes, site progress, hours, and margin — built for contractors who run on signal, not spreadsheets.
@@ -268,7 +270,7 @@
     var s = document.createElement('script');
     s.type = 'module';
     s.crossOrigin = '';
-    s.src = './assets/index-f3-door.js';
+    s.src = './assets/index-f4-door.js';
     document.head.appendChild(s);
   }
   document.getElementById('boot-email').addEventListener('input', function () {
