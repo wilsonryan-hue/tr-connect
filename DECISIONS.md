@@ -17,3 +17,8 @@
 - Door-guard script: scripts/door-lock-check.sh (pages.yml CI step blocked until a credential with `workflow` scope updates the Actions workflow).
 - Custom domain connect.treunroccontracts.com: CNAME Host=connect Value=wilsonryan-hue.github.io when Namecheap allows — domain attach only.
 - CI workflow edit blocked: gh OAuth token lacks `workflow` scope. Guard script at scripts/door-lock-check.sh until a token/user with workflow scope updates .github/workflows/pages.yml.
+
+## 2026-09-09 — Ryan override: staff login live
+- Ryan ordered staff login working immediately (closed-door HTML removed).
+- Restored desk SPA from 2bcba83 (no live-state.json).
+- Server /api/staff-auth still not live; device/local login path as in that build.
