@@ -12,13 +12,161 @@
     <link rel="apple-touch-icon" href="./icon-180.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <style>
-      html, body { background:#0a0a0a; color:#f3f0e6; margin:0; }
-      img[src*="tr-logo"] { width:32px !important; height:32px !important; max-width:32px !important; max-height:32px !important; object-fit:contain; }
+      html, body { background:#0a0a0a; color:#f3f0e6; margin:0; font-family: system-ui, sans-serif; }
+      #boot { min-height:100dvh; display:grid; place-items:center; padding:24px; }
+      #boot.hidden { display:none; }
+      #boot-card { width:100%; max-width:24rem; border:1px solid #333; border-radius:12px; background:#141414; padding:20px; }
+      #boot-card h1 { margin:0; font-size:1.25rem; color:#c9a227; }
+      #boot-card .sub { margin:4px 0 16px; font-size:12px; color:#9a9a9a; }
+      #boot-card label { display:block; font-size:12px; color:#c9a227; margin:12px 0 4px; text-transform:uppercase; letter-spacing:.08em; }
+      #boot-card input { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:8px; border:1px solid #333; background:#0a0a0a; color:#f3f0e6; }
+      #boot-card button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px; background:#c9a227; color:#0a0a0a; font-weight:600; cursor:pointer; }
+      #boot-card .err { color:#f07178; font-size:14px; margin-top:8px; min-height:1.2em; }
+      #boot-card .hint { font-size:12px; color:#9a9a9a; margin-top:12px; }
+      #app:empty + #boot { display:grid; }
     </style>
-    <script type="module" crossorigin src="./assets/index-f2-login.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/style-BdKMu5_G.css">
   </head>
-  <body class="bg-bg text-fg">
+  <body>
     <div id="app"></div>
+    <div id="boot" class="hidden" aria-live="polite">
+      <form id="boot-card" autocomplete="on">
+        <h1>Treun Roc Connect</h1>
+        <div class="sub">Staff sign-in</div>
+        <p class="hint">Enter your work email. First visit: create a password (8+ characters).</p>
+        <label for="boot-email">Work email</label>
+        <input id="boot-email" name="email" type="email" autocomplete="username" required placeholder="Work email" />
+        <label for="boot-pass">Password</label>
+        <input id="boot-pass" name="password" type="password" autocomplete="current-password" required placeholder="Password" minlength="8" />
+        <div id="boot-confirm-wrap" class="hidden">
+          <label for="boot-pass2">Type it again</label>
+          <input id="boot-pass2" name="password2" type="password" autocomplete="new-password" placeholder="Type it again" minlength="8" />
+        </div>
+        <div class="err" id="boot-err"></div>
+        <button type="submit" id="boot-submit">Sign in</button>
+        <button type="button" id="boot-forgot" style="margin-top:8px;background:transparent;color:#c9a227;border:0;width:100%;cursor:pointer;">Forgot — new password</button>
+      </form>
+    </div>
+    <script>
+(function () {
+  var SESSION = 'tr.desktop.session';
+  var BOOK = 'tr.password-book.v2';
+  var boot = document.getElementById('boot');
+  var err = document.getElementById('boot-err');
+  var confirmWrap = document.getElementById('boot-confirm-wrap');
+  var creating = false;
+  var spaLoaded = false;
+
+  function allowed(email) {
+    return /^[^\s@]+@treunroc\.com$/i.test(email) || /^[^\s@]+@treunroc\.co\.uk$/i.test(email);
+  }
+  function readSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION) || 'null'); } catch (e) { return null; }
+  }
+  function readBook() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(BOOK) || '{}');
+      if (raw && raw.book && typeof raw.book === 'object') return raw.book;
+      return raw && typeof raw === 'object' ? raw : {};
+    } catch (e) { return {}; }
+  }
+  function writeBook(book) {
+    localStorage.setItem(BOOK, JSON.stringify(book));
+    try { localStorage.setItem('tr.password-book', JSON.stringify(book)); } catch (e) {}
+  }
+  function hex(buf) {
+    return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  async function sha256(text) {
+    var data = new TextEncoder().encode(text);
+    return hex(await crypto.subtle.digest('SHA-256', data));
+  }
+  async function hashPass(password, salt) {
+    return sha256(salt + ':' + password);
+  }
+  function randomSalt() {
+    var a = new Uint8Array(16);
+    crypto.getRandomValues(a);
+    return hex(a);
+  }
+  function setCreating(on) {
+    creating = on;
+    confirmWrap.classList.toggle('hidden', !on);
+    document.getElementById('boot-submit').textContent = on ? 'Save password and open' : 'Sign in';
+    document.getElementById('boot-pass').autocomplete = on ? 'new-password' : 'current-password';
+  }
+  function showBoot() {
+    boot.classList.remove('hidden');
+    var email = (document.getElementById('boot-email').value || '').trim().toLowerCase();
+    var book = readBook();
+    setCreating(!(email && book[email] && book[email].hash && book[email].salt));
+  }
+  function hideBoot() { boot.classList.add('hidden'); }
+  function loadSpa() {
+    if (spaLoaded) return;
+    spaLoaded = true;
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.crossOrigin = '';
+    s.src = './assets/index-f2-login.js';
+    document.head.appendChild(s);
+  }
+  document.getElementById('boot-email').addEventListener('input', function () {
+    var email = (this.value || '').trim().toLowerCase();
+    var book = readBook();
+    if (!creating) setCreating(!(email && book[email] && book[email].hash));
+  });
+  document.getElementById('boot-forgot').addEventListener('click', function () {
+    setCreating(true);
+    err.textContent = '';
+    document.getElementById('boot-pass').value = '';
+    document.getElementById('boot-pass2').value = '';
+  });
+  document.getElementById('boot-card').addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    err.textContent = '';
+    var email = (document.getElementById('boot-email').value || '').trim().toLowerCase();
+    var pass = document.getElementById('boot-pass').value || '';
+    var pass2 = document.getElementById('boot-pass2').value || '';
+    if (!allowed(email)) { err.textContent = 'Use your Treun Roc work email.'; return; }
+    if (pass.length < 8) { err.textContent = 'Password needs at least 8 characters.'; return; }
+    var book = readBook();
+    try {
+      if (creating) {
+        if (pass !== pass2) { err.textContent = 'Those two passwords do not match.'; return; }
+        var salt = randomSalt();
+        var hash = await hashPass(pass, salt);
+        book[email] = { salt: salt, hash: hash, name: email.split('@')[0], setAt: new Date().toISOString() };
+        writeBook(book);
+      } else {
+        var row = book[email];
+        if (!row || !row.salt || !row.hash) { setCreating(true); err.textContent = 'Create a password for this device.'; return; }
+        var check = await hashPass(pass, row.salt);
+        if (check !== row.hash) { err.textContent = 'Wrong password. Tap Forgot to set a new one.'; return; }
+      }
+      var token = randomSalt() + randomSalt();
+      var session = { email: email, name: (book[email] && book[email].name) || email.split('@')[0], token: token, seat: 'office' };
+      localStorage.setItem(SESSION, JSON.stringify(session));
+      try { sessionStorage.setItem(SESSION, JSON.stringify(session)); } catch (e) {}
+      hideBoot();
+      if (!location.hash || location.hash === '#/login' || location.hash.indexOf('#/login') === 0) {
+        location.hash = '#/';
+      }
+      loadSpa();
+    } catch (e) {
+      err.textContent = 'Could not sign in. Try again.';
+    }
+  });
+
+  var existing = readSession();
+  if (existing && existing.email) {
+    hideBoot();
+    loadSpa();
+  } else {
+    showBoot();
+    // Do not load SPA until signed in — avoids blank/Aw Snap on login route
+  }
+})();
+    </script>
+    <link rel="stylesheet" crossorigin href="./assets/style-BdKMu5_G.css">
   </body>
 </html>
