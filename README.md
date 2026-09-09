@@ -1,5 +1,15 @@
-# Treun Roc Connect
+# Treun Roc Connect — staff desk
 
-Staff desk: https://www.tchworks.co.uk/tr-connect/
+This repo is the **employee / owner system**. It is not the client website.
 
-This is Treun Roc Connect, not TCH Works. GitHub serves it on the TCH host because the user Pages CNAME is tchworks.co.uk. The shop is the domain root. This repo is the contractor desk.
+| | |
+| --- | --- |
+| Client website (do not touch) | https://treunroccontracts.com |
+| Staff desk **live now** | https://www.tchworks.co.uk/tr-connect/ |
+| Company staff address (when DNS exists) | https://connect.treunroccontracts.com |
+
+The TCH hostname is GitHub’s user-site CNAME. The product on this path is Treun Roc Connect. The TCH shop is the domain root and a different business.
+
+Do not put a `CNAME` file in this repo until `connect.treunroccontracts.com` already points at `wilsonryan-hue.github.io`. A premature CNAME file takes the live desk down.
+
+Tap your name. First time on a device: ConnectDesk1
