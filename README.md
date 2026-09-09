@@ -1,15 +1,14 @@
-# Treun Roc Connect — staff desk
+# Treun Roc Connect — public door (CLOSED)
 
-This repo is the **employee / owner system**. It is not the client website.
+**Live URLs (same closed-door static page):**
 
-| | |
-| --- | --- |
-| Client website (do not touch) | https://treunroccontracts.com |
-| Staff desk **live now** | https://www.tchworks.co.uk/tr-connect/ |
-| Company staff address (when DNS exists) | https://connect.treunroccontracts.com |
+- https://wilsonryan-hue.github.io/tr-connect/ (redirects to custom domain)
+- https://www.tchworks.co.uk/tr-connect/
 
-The TCH hostname is GitHub’s user-site CNAME. The product on this path is Treun Roc Connect. The TCH shop is the domain root and a different business.
+Staff sign-in is **not** available on this public door. The page is intentional closed-door HTML only — no SPA desk, no login form.
 
-Do not put a `CNAME` file in this repo until `connect.treunroccontracts.com` already points at `wilsonryan-hue.github.io`. A premature CNAME file takes the live desk down.
+Do not send staff to any `grok-sandbox` or `localhost` link.
 
-Tap your name. First time on a device: ConnectDesk1
+Reconstructed maintenance source + server-side staff-auth prep live separately on the agent box (`tr-connect-src`); they are not published from this Pages repo. Deploying a real desk stays blocked on Ryan host choice (see PREP.md there). Do not push desk code to Pages.
+
+`live.json` points at this Pages door URL (self). There is no separate live desk host URL.
