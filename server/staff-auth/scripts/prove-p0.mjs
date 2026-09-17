@@ -130,6 +130,7 @@ writeFileSync(
           email: EMAIL,
           name: 'Prove User',
           role: 'OFFICE',
+          tenantId: 'treunroc',
           salt,
           hash,
         },
@@ -237,6 +238,8 @@ try {
     }
     if (body && body.email !== EMAIL) fail(`token response email mismatch: ${body && body.email}`)
     else if (body) pass(`token response email=${body.email}`)
+    if (!body || body.tenantId !== 'treunroc') fail(`token response tenantId missing/wrong: ${body && body.tenantId}`)
+    else pass(`token response tenantId=${body.tenantId}`)
   }
 
   // Bearer GET → user
@@ -249,6 +252,9 @@ try {
 
     if (!body || body.email !== EMAIL) fail(`Bearer user mismatch: ${text.slice(0, 200)}`)
     else pass(`GET Bearer → user ${body.email}`)
+
+    if (!body || body.tenantId !== 'treunroc') fail(`Bearer tenantId missing/wrong: ${body && body.tenantId}`)
+    else pass(`GET Bearer → tenantId=${body.tenantId}`)
 
     if (body.hash || body.salt || body.book) fail('Bearer response leaked hash/salt/book')
     else pass('Bearer response has no hash/salt/book')

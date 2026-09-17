@@ -174,6 +174,7 @@ const server = createServer(async (req, res) => {
         email: session.email,
         name: session.name,
         role: session.role,
+        tenantId: session.tenantId || 'treunroc',
       })
       return
     }
@@ -261,6 +262,7 @@ const server = createServer(async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        tenantId: user.tenantId || 'treunroc',
       },
       rateLimitHeaders(rlOk),
     )

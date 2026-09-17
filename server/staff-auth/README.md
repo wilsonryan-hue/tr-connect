@@ -64,3 +64,11 @@ Do not start a new Connect repo. Do not treat a Grok sandbox as the staff door.
 - After TLS URL is live: set Pages `live.json` `api_base` to that origin (no trailing slash)
 - Prove: `node scripts/prove-p0.mjs` locally; then curl live `/health` + empty-book GET
 - Full oneshot: `/workspace/ops/TR-STAFF-AUTH-DEPLOY-ONESHOT-2026-09-17.md`
+
+
+## P1 tenancy (2026-09-17)
+
+- Every user may include `tenantId` (default **`treunroc`** if omitted).
+- `POST /api/staff-auth` and Bearer `GET` return `tenantId` on the session payload.
+- **Tenant B path:** add users with a different `tenantId` (e.g. `acme-contracts`) on the same server/users.json — no code fork. Desk data isolation comes later (jobs rows must carry the same tenantId).
+- Never commit real users.json.

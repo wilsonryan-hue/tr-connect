@@ -12,7 +12,7 @@ const SCRYPT_R = 8
 const SCRYPT_P = 1
 const KEYLEN = 64
 
-/** @typedef {{ email: string, name: string, role: 'RYAN'|'OFFICE'|'WORKER', salt: string, hash: string }} UserRecord */
+/** @typedef {{ email: string, name: string, role: 'RYAN'|'OFFICE'|'WORKER', tenantId: string, salt: string, hash: string }} UserRecord */
 /** @typedef {{ users: UserRecord[] }} UserBook */
 
 export function usersPath() {
@@ -34,6 +34,8 @@ export function loadUsers() {
           email: String(u.email).trim().toLowerCase(),
           name: String(u.name ?? u.email),
           role: u.role === 'RYAN' || u.role === 'WORKER' ? u.role : 'OFFICE',
+          // Default missing tenantId → treunroc (Tenant A). Tenant B must set explicitly.
+          tenantId: String(u.tenantId || 'treunroc').trim() || 'treunroc',
           salt: String(u.salt),
           hash: String(u.hash),
         })),
@@ -88,6 +90,7 @@ export function createSession(user) {
     email: user.email,
     name: user.name,
     role: user.role,
+    tenantId: user.tenantId || 'treunroc',
     createdAt: Date.now(),
   })
   return token
