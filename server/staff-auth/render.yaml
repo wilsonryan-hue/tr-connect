@@ -1,0 +1,21 @@
+# Render Blueprint — Treun Roc Connect staff-auth (free-tier ready)
+# MD automates host; set CORS + users.json secret after first deploy.
+# After TLS URL live: set Pages live.json api_base to the service URL (no trailing slash).
+services:
+  - type: web
+    name: tr-connect-staff-auth
+    runtime: node
+    plan: free
+    rootDir: server/staff-auth
+    buildCommand: "echo no-build"
+    startCommand: node src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: CORS_ORIGIN
+        value: "https://connect.treunroccontracts.com"
+      - key: STAFF_AUTH_USERS
+        value: "./users.json"

@@ -1,0 +1,14 @@
+{
+  "name": "tr-connect-staff-auth",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Portable Node reference for Treun Roc Connect GET/POST /api/staff-auth. Prep only — not a live desk.",
+  "scripts": {
+    "start": "node src/server.js",
+    "hash-password": "node src/hash-password.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

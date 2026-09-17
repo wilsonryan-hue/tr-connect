@@ -1,0 +1,186 @@
+#!/usr/bin/env node
+/**
+ * Portable reference: GET/POST /api/staff-auth
+ * Prep / local only. Deploy later to Origin or a paid host Ryan chooses.
+ * No guest password-create. No public named staff list.
+ */
+import { createServer } from 'node:http'
+import {
+  loadUsers,
+  verifyPassword,
+  createSession,
+  getSession,
+  isLocked,
+  recordFailure,
+  clearFailures,
+  usersPath,
+  RATE,
+} from './store.js'
+
+const PORT = Number(process.env.PORT || 8787)
+const HOST = process.env.HOST || '127.0.0.1'
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*'
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = []
+    let size = 0
+    const MAX = 64 * 1024
+    req.on('data', (c) => {
+      size += c.length
+      if (size > MAX) {
+        reject(new Error('body too large'))
+        req.destroy()
+        return
+      }
+      chunks.push(c)
+    })
+    req.on('end', () => {
+      try {
+        const raw = Buffer.concat(chunks).toString('utf8')
+        resolve(raw ? JSON.parse(raw) : {})
+      } catch {
+        reject(new Error('invalid json'))
+      }
+    })
+    req.on('error', reject)
+  })
+}
+
+function send(res, status, body) {
+  const payload = JSON.stringify(body)
+  res.writeHead(status, {
+    'content-type': 'application/json; charset=utf-8',
+    'cache-control': 'no-store',
+    'access-control-allow-origin': CORS_ORIGIN,
+    'access-control-allow-headers': 'content-type, authorization',
+    'access-control-allow-methods': 'GET, POST, OPTIONS',
+  })
+  res.end(payload)
+}
+
+function clientIp(req) {
+  const xf = req.headers['x-forwarded-for']
+  if (typeof xf === 'string' && xf.length) return xf.split(',')[0].trim()
+  return req.socket.remoteAddress || 'unknown'
+}
+
+function bearer(req) {
+  const h = req.headers.authorization
+  if (!h || typeof h !== 'string') return null
+  const m = /^Bearer\s+(\S+)$/i.exec(h)
+  return m ? m[1] : null
+}
+
+function pathOnly(url) {
+  return (url || '').split('?')[0]
+}
+
+const server = createServer(async (req, res) => {
+  const path = pathOnly(req.url)
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'access-control-allow-origin': CORS_ORIGIN,
+      'access-control-allow-headers': 'content-type, authorization',
+      'access-control-allow-methods': 'GET, POST, OPTIONS',
+    })
+    res.end()
+    return
+  }
+
+  if (path !== '/api/staff-auth') {
+    send(res, 404, { error: 'Not found' })
+    return
+  }
+
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    const token = bearer(req)
+    if (token) {
+      const session = getSession(token)
+      if (!session) {
+        send(res, 401, { error: 'Session expired or unknown.' })
+        return
+      }
+      send(res, 200, {
+        email: session.email,
+        name: session.name,
+        role: session.role,
+      })
+      return
+    }
+    // Unauthenticated: empty book only — no roster, no hashes
+    send(res, 200, { v: 1, book: {} })
+    return
+  }
+
+  if (req.method === 'POST') {
+    let body
+    try {
+      body = await readJsonBody(req)
+    } catch {
+      send(res, 400, { error: 'Invalid JSON body.' })
+      return
+    }
+
+    const email = String(body.email ?? '')
+      .trim()
+      .toLowerCase()
+    const password = String(body.password ?? '')
+    const ip = clientIp(req)
+
+    if (!email || !email.includes('@')) {
+      send(res, 400, { error: 'Email is required.' })
+      return
+    }
+    if (password.length < 8) {
+      send(res, 400, { error: 'Password needs at least 8 characters.' })
+      return
+    }
+
+    if (isLocked(email, ip)) {
+      send(res, 429, {
+        error: 'Too many attempts. Wait 15 minutes, then try again.',
+        locked: true,
+      })
+      return
+    }
+
+    const { users } = loadUsers()
+    const user = users.find((u) => u.email === email)
+    if (!user || !verifyPassword(password, user)) {
+      recordFailure(email, ip)
+      if (isLocked(email, ip)) {
+        send(res, 429, {
+          error: 'Too many attempts. Wait 15 minutes, then try again.',
+          locked: true,
+        })
+        return
+      }
+      send(res, 401, { error: 'Email or password not recognised.' })
+      return
+    }
+
+    clearFailures(email, ip)
+    const token = createSession(user)
+    send(res, 200, {
+      token,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    })
+    return
+  }
+
+  send(res, 405, { error: 'Method not allowed' })
+})
+
+server.listen(PORT, HOST, () => {
+  console.log(
+    `[staff-auth] listening on http://${HOST}:${PORT}/api/staff-auth (prep — not live desk)`,
+  )
+  console.log(`[staff-auth] users file: ${usersPath()} (gitignored; copy from users.json.example)`)
+  console.log(
+    `[staff-auth] rate limit: ${RATE.FAIL_MAX} failures / ${RATE.FAIL_WINDOW_MS / 60000} min`,
+  )
+})
