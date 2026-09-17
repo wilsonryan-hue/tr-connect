@@ -1,6 +1,6 @@
 # GATE — Ryan-only Management P&L + money-screen jd gates · 2026-09-17
 
-## Result: PASS (code + export URL pending Pages deploy)
+## Result: PASS
 
 | Check | Result |
 |-------|--------|
@@ -15,7 +15,7 @@
 | Finance Ryan buttons | **PASS** — Management P&L .xlsx + Export live pack (CSV) + page link |
 | `#/management-pnl` | **PASS** — `mgmtR0=Qr(/management-pnl)` jd-gated |
 | Live CSV | **PASS** — `exportRyanMgmtPack()` → `TR-Connect-Management-PnL-LIVE-YYYY-MM-DD.csv` via `vS` |
-| Export URL curl 200 | *(fill after push/Pages)* https://connect.treunroccontracts.com/exports/TR-Connect-Management-PnL.xlsx |
+| Export URL curl 200 | **PASS** — HTTP 200, 20932 bytes, 5 sheets |
 | Browser role prove | **DEFERRED** — door login session may wait; code evidence below |
 
 ## Code evidence (grep)
@@ -45,6 +45,9 @@ Browser session prove may wait on door login — note for follow-up.
 
 ## Prove URL
 https://connect.treunroccontracts.com/exports/TR-Connect-Management-PnL.xlsx
+
+## Commits
+`48b48ff` — Ryan-only Management P&L pack + money-screen jd gates
 
 ## Gated (what changed)
 - Money screens tightened to Ryan (`jd`): Finance full book (`Fd`), Report (`w1`), Invoice raise/exports (`dC`)
