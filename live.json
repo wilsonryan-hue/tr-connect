@@ -2,9 +2,9 @@
   "app": "Treun Roc Connect",
   "url": "https://connect.treunroccontracts.com/",
   "legacy_tchworks": "https://www.tchworks.co.uk/tr-connect/",
-  "updated": "2026-09-17T16:45:00Z",
+  "updated": "2026-09-17T17:52:00Z",
   "note": "MD GO after DNS_OK. Custom domain connect.treunroccontracts.com. LOGIN_OK held.",
-  "api_base": null,
-  "auth_mode": "device-local-fallback",
-  "p0": "API-first boot ready; set api_base when staff-auth host live"
+  "api_base": "https://accent-composed-adaptor-televisions.trycloudflare.com",
+  "auth_mode": "server",
+  "p0": "staff-auth interim quick-tunnel; replace with durable host ASAP"
 }
