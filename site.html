@@ -212,6 +212,7 @@
   var confirmWrap = document.getElementById('boot-confirm-wrap');
   var creating = false;
   var spaLoaded = false;
+  var apiBase = null; // string origin when live.json.api_base set; else null → device-local
   var door = document.getElementById('door-host');
   if (door) {
     var host = location.host + location.pathname.replace(/\/$/, '');
@@ -220,6 +221,10 @@
     } else {
       door.textContent = host.replace(/^www\./, '');
     }
+  }
+
+  function setAuthMode(mode) {
+    if (boot) boot.setAttribute('data-auth-mode', mode);
   }
 
   function allowed(email) {
@@ -236,8 +241,8 @@
     } catch (e) { return {}; }
   }
   function writeBook(book) {
+    // v2 only — stop dual-writing legacy key 'tr.password-book'
     localStorage.setItem(BOOK, JSON.stringify(book));
-    try { localStorage.setItem('tr.password-book', JSON.stringify(book)); } catch (e) {}
   }
   function hex(buf) {
     return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
@@ -256,12 +261,18 @@
     confirmWrap.classList.toggle('hidden', !on);
     document.getElementById('boot-submit').textContent = on ? 'Save password and open' : 'Enter desk';
     document.getElementById('boot-pass').autocomplete = on ? 'new-password' : 'current-password';
+    var forgot = document.getElementById('boot-forgot');
+    if (forgot) forgot.classList.toggle('hidden', apiBase != null);
   }
   function showBoot() {
     boot.classList.remove('hidden');
     var email = (document.getElementById('boot-email').value || '').trim().toLowerCase();
-    var book = readBook();
-    setCreating(!(email && book[email] && book[email].hash && book[email].salt));
+    if (apiBase) {
+      setCreating(false);
+    } else {
+      var book = readBook();
+      setCreating(!(email && book[email] && book[email].hash && book[email].salt));
+    }
   }
   function hideBoot() { boot.classList.add('hidden'); }
   function loadSpa() {
@@ -273,12 +284,88 @@
     s.src = './assets/index-f4-door.js';
     document.head.appendChild(s);
   }
+  function openDesk(session) {
+    localStorage.setItem(SESSION, JSON.stringify(session));
+    try { sessionStorage.setItem(SESSION, JSON.stringify(session)); } catch (e) {}
+    hideBoot();
+    if (!location.hash || location.hash.indexOf('#/login') === 0) location.hash = '#/';
+    loadSpa();
+  }
+
+  async function loginViaApi(email, pass) {
+    var url = String(apiBase).replace(/\/$/, '') + '/api/staff-auth';
+    var res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pass })
+      });
+    } catch (e) {
+      err.textContent = 'Could not reach staff sign-in server. Check the network and try again.';
+      return;
+    }
+    var body = null;
+    try { body = await res.json(); } catch (e) { body = null; }
+    if (!res.ok) {
+      if (res.status === 429) {
+        err.textContent = (body && body.error) || 'Too many attempts. Wait and try again.';
+      } else if (res.status === 401) {
+        err.textContent = (body && body.error) || 'Email or password not recognised.';
+      } else {
+        err.textContent = (body && body.error) || ('Sign-in failed (' + res.status + '). No device-book fallback while api_base is set.');
+      }
+      return;
+    }
+    if (!body || !body.token) {
+      err.textContent = 'Sign-in server returned no session token.';
+      return;
+    }
+    // Opaque token session only — NEVER write password-book when api_base configured
+    openDesk({
+      email: body.email || email,
+      name: body.name || email.split('@')[0],
+      token: body.token,
+      seat: body.role ? String(body.role).toLowerCase() : 'office',
+      auth: 'server'
+    });
+  }
+
+  async function loginDeviceLocal(email, pass, pass2) {
+    var book = readBook();
+    if (creating) {
+      if (pass !== pass2) { err.textContent = 'Those two passwords do not match.'; return; }
+      var salt = randomSalt();
+      var hash = await hashPass(pass, salt);
+      book[email] = { salt: salt, hash: hash, name: email.split('@')[0], setAt: new Date().toISOString() };
+      writeBook(book);
+    } else {
+      var row = book[email];
+      if (!row || !row.salt || !row.hash) { setCreating(true); err.textContent = 'Create a password for this device.'; return; }
+      var check = await hashPass(pass, row.salt);
+      if (check !== row.hash) { err.textContent = 'Wrong password. Tap Forgot to set a new one.'; return; }
+    }
+    var token = randomSalt() + randomSalt();
+    openDesk({
+      email: email,
+      name: (book[email] && book[email].name) || email.split('@')[0],
+      token: token,
+      seat: 'office',
+      auth: 'device-local'
+    });
+  }
+
   document.getElementById('boot-email').addEventListener('input', function () {
+    if (apiBase) return;
     var email = (this.value || '').trim().toLowerCase();
     var book = readBook();
     if (!creating) setCreating(!(email && book[email] && book[email].hash));
   });
   document.getElementById('boot-forgot').addEventListener('click', function () {
+    if (apiBase) {
+      err.textContent = 'Password reset is handled by the staff sign-in server.';
+      return;
+    }
     setCreating(true);
     err.textContent = '';
     document.getElementById('boot-pass').value = '';
@@ -292,40 +379,44 @@
     var pass2 = document.getElementById('boot-pass2').value || '';
     if (!allowed(email)) { err.textContent = 'Use your Treun Roc work email.'; return; }
     if (pass.length < 8) { err.textContent = 'Password needs at least 8 characters.'; return; }
-    var book = readBook();
     try {
-      if (creating) {
-        if (pass !== pass2) { err.textContent = 'Those two passwords do not match.'; return; }
-        var salt = randomSalt();
-        var hash = await hashPass(pass, salt);
-        book[email] = { salt: salt, hash: hash, name: email.split('@')[0], setAt: new Date().toISOString() };
-        writeBook(book);
+      if (apiBase) {
+        await loginViaApi(email, pass);
       } else {
-        var row = book[email];
-        if (!row || !row.salt || !row.hash) { setCreating(true); err.textContent = 'Create a password for this device.'; return; }
-        var check = await hashPass(pass, row.salt);
-        if (check !== row.hash) { err.textContent = 'Wrong password. Tap Forgot to set a new one.'; return; }
+        await loginDeviceLocal(email, pass, pass2);
       }
-      var token = randomSalt() + randomSalt();
-      var session = { email: email, name: (book[email] && book[email].name) || email.split('@')[0], token: token, seat: 'office' };
-      localStorage.setItem(SESSION, JSON.stringify(session));
-      try { sessionStorage.setItem(SESSION, JSON.stringify(session)); } catch (e) {}
-      hideBoot();
-      if (!location.hash || location.hash.indexOf('#/login') === 0) location.hash = '#/';
-      loadSpa();
     } catch (e) {
       err.textContent = 'Could not sign in. Try again.';
     }
   });
 
-  var existing = readSession();
-  if (existing && existing.email) {
-    hideBoot();
-    loadSpa();
-  } else {
-    showBoot();
+  async function bootFromLive() {
+    try {
+      var res = await fetch('./live.json?cb=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        var live = await res.json();
+        if (live && typeof live.api_base === 'string' && live.api_base.trim()) {
+          apiBase = live.api_base.trim();
+        } else {
+          apiBase = null;
+        }
+      }
+    } catch (e) {
+      apiBase = null;
+    }
+    setAuthMode(apiBase ? 'server' : 'device-local');
+    var existing = readSession();
+    if (existing && existing.email) {
+      hideBoot();
+      loadSpa();
+    } else {
+      showBoot();
+    }
   }
+
+  bootFromLive();
 })();
+    </script>
     </script>
     <link rel="stylesheet" crossorigin href="./assets/style-BdKMu5_G.css">
   </body>
