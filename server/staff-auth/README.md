@@ -72,3 +72,15 @@ Do not start a new Connect repo. Do not treat a Grok sandbox as the staff door.
 - `POST /api/staff-auth` and Bearer `GET` return `tenantId` on the session payload.
 - **Tenant B path:** add users with a different `tenantId` (e.g. `acme-contracts`) on the same server/users.json — no code fork. Desk data isolation comes later (jobs rows must carry the same tenantId).
 - Never commit real users.json.
+
+## TR Bot desk chat (2026-09-21)
+
+| Method | Path | Notes |
+|--------|------|-------|
+| POST | `/api/tr-bot/messages` | `{ threadId?, staffName?, staffEmail?, text }` → `{ threadId, messages }` |
+| GET | `/api/tr-bot/messages?threadId=` | Thread transcript |
+| POST | `/api/tr-bot/reply` | `{ threadId, text, secret }` — secret must match `TR_BOT_REPLY_SECRET` (prep default `tr-desk-local`) |
+
+Env: `TR_BOT_WEBHOOK_URL` (optional fire-and-forget), `TR_BOT_REPLY_SECRET`, optional `TR_BOT_THREADS_PATH`.  
+Store: `data/tr-bot-threads.json` (gitignored). Ops: `/workspace/ops/TR-BOT-DESK-EMBED-2026-09-21.md`.
+

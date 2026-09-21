@@ -18,10 +18,29 @@ import {
   usersPath,
   RATE,
 } from './store.js'
+import {
+  appendStaffMessage,
+  appendAssistantMessage,
+  getThreadMessages,
+  storePath as trBotStorePath,
+} from './tr-bot-store.js'
 
 const PORT = Number(process.env.PORT || 8787)
 const HOST = process.env.HOST || '127.0.0.1'
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*'
+const TR_BOT_WEBHOOK_URL = (process.env.TR_BOT_WEBHOOK_URL || '').trim()
+const TR_BOT_REPLY_SECRET = process.env.TR_BOT_REPLY_SECRET || 'tr-desk-local'
+
+function fireTrBotWebhook(event) {
+  if (!TR_BOT_WEBHOOK_URL) return
+  // Fire-and-forget — never fail the chat response on webhook errors
+  fetch(TR_BOT_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(event),
+  }).catch(() => {})
+}
+
 
 /** Comma-separated allow-list, or * for any (prep default). Set CORS_ORIGIN to SPA origin(s) on a real host. */
 function allowedOrigins() {
@@ -157,6 +176,90 @@ const server = createServer(async (req, res) => {
     return
   }
 
+  // --- TR Bot desk chat ---
+  if (path === '/api/tr-bot/messages') {
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      const q = new URL(req.url || '/', 'http://local').searchParams
+      const threadId = q.get('threadId') || ''
+      const out = getThreadMessages(threadId)
+      send(res, req, 200, out)
+      return
+    }
+    if (req.method === 'POST') {
+      let body
+      try {
+        body = await readJsonBody(req)
+      } catch {
+        send(res, req, 400, { error: 'Invalid JSON body.' })
+        return
+      }
+      const text = String(body.text ?? '').trim()
+      if (!text) {
+        send(res, req, 400, { error: 'text is required.' })
+        return
+      }
+      try {
+        const out = appendStaffMessage({
+          threadId: body.threadId,
+          staffName: body.staffName,
+          staffEmail: body.staffEmail,
+          text,
+        })
+        fireTrBotWebhook({
+          type: 'tr-bot.message',
+          threadId: out.threadId,
+          text,
+          staffName: out.message.staffName || null,
+          staffEmail: out.message.staffEmail || null,
+          message: out.message,
+          agentHint: { name: 'TR Bot', id: '4756316' },
+          channelHint: {
+            name: 'TR Desk Relay',
+            id: '8512072a-171f-448c-bff6-99f6f91af023',
+          },
+        })
+        send(res, req, 200, { threadId: out.threadId, messages: out.messages })
+      } catch (err) {
+        send(res, req, 400, { error: err?.message || 'Could not save message.' })
+      }
+      return
+    }
+    send(res, req, 405, { error: 'Method not allowed' })
+    return
+  }
+
+  if (path === '/api/tr-bot/reply') {
+    if (req.method === 'POST') {
+      let body
+      try {
+        body = await readJsonBody(req)
+      } catch {
+        send(res, req, 400, { error: 'Invalid JSON body.' })
+        return
+      }
+      const secret = String(body.secret ?? '')
+      if (secret !== TR_BOT_REPLY_SECRET) {
+        send(res, req, 401, { error: 'Unauthorized.' })
+        return
+      }
+      const threadId = String(body.threadId ?? '').trim()
+      const text = String(body.text ?? '').trim()
+      if (!threadId || !text) {
+        send(res, req, 400, { error: 'threadId and text are required.' })
+        return
+      }
+      try {
+        const out = appendAssistantMessage({ threadId, text })
+        send(res, req, 200, { threadId: out.threadId, messages: out.messages })
+      } catch (err) {
+        send(res, req, 400, { error: err?.message || 'Could not save reply.' })
+      }
+      return
+    }
+    send(res, req, 405, { error: 'Method not allowed' })
+    return
+  }
+
   if (path !== '/api/staff-auth') {
     send(res, req, 404, { error: 'Not found' })
     return
@@ -286,6 +389,13 @@ server.listen(PORT, HOST, () => {
     `[staff-auth] rate limit: ${RATE.FAIL_MAX} failures / ${RATE.FAIL_WINDOW_MS / 60000} min (headers: Retry-After, X-RateLimit-*)`,
   )
   console.log(`[staff-auth] CORS_ORIGIN: ${corsDesc}`)
+  console.log(`[staff-auth] TR Bot threads: ${trBotStorePath()}`)
+  console.log(
+    `[staff-auth] TR Bot: POST/GET /api/tr-bot/messages · POST /api/tr-bot/reply (secret env TR_BOT_REPLY_SECRET)`,
+  )
+  console.log(
+    `[staff-auth] TR Bot webhook: ${TR_BOT_WEBHOOK_URL ? 'set' : 'unset (TR_BOT_WEBHOOK_URL)'}`,
+  )
   console.log(
     '[staff-auth] DOOR: Pages SPA stays CLOSED until /api is live — no push / no publish from prep',
   )
