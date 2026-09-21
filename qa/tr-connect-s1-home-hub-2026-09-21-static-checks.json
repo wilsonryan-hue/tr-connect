@@ -1,0 +1,54 @@
+[
+  {
+    "id": "section_map_marker",
+    "pass": true
+  },
+  {
+    "id": "section_map_label",
+    "pass": true
+  },
+  {
+    "id": "section_cards",
+    "pass": true
+  },
+  {
+    "id": "no_goto_chips",
+    "pass": true
+  },
+  {
+    "id": "needs_condensed",
+    "pass": true
+  },
+  {
+    "id": "on_site_preserved",
+    "pass": true
+  },
+  {
+    "id": "runway_filter_js",
+    "pass": true
+  },
+  {
+    "id": "runway_zero_css",
+    "pass": true
+  },
+  {
+    "id": "s1_css_block",
+    "pass": true
+  },
+  {
+    "id": "cache_bust",
+    "pass": true
+  },
+  {
+    "id": "tr_bot_kept",
+    "pass": true
+  },
+  {
+    "id": "sidebar_ab_kept",
+    "pass": true
+  },
+  {
+    "id": "persist_v11",
+    "pass": true
+  }
+]
