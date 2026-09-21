@@ -1,0 +1,43 @@
+{
+  "checks": {
+    "ab_order": true,
+    "ab_tos": true,
+    "no_tenders_dup_in_more": true,
+    "more_has_calendar_report": true,
+    "aside_md_block": true,
+    "aside_w56": true,
+    "hamburger_md_hidden": true,
+    "drawer_md_hidden": true,
+    "more_default_office": true,
+    "home_goto_chips": true,
+    "nb_group_headings": true,
+    "ob_intact": true,
+    "cache_bust": true,
+    "css_nav_addon": true,
+    "md_block_utility": true
+  },
+  "ab_labels": [
+    "Home",
+    "Jobs",
+    "Mail",
+    "Quotes",
+    "Quick BD",
+    "Approvals",
+    "Finance",
+    "Invoices",
+    "Live Monitor",
+    "Workers",
+    "Site app"
+  ],
+  "jb_labels": [
+    "Calendar",
+    "Suppliers",
+    "Materials",
+    "Company files",
+    "Report",
+    "Team",
+    "Share links",
+    "Get the app"
+  ],
+  "pass": true
+}

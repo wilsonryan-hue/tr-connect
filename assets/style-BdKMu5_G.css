@@ -181,3 +181,11 @@ header.fixed,
   font-weight:500;
 }
 /* === /TR-CONNECT-AESTHETIC-2026-09-21 === */
+
+/* TR Connect nav IA 2026-09-21 — first-class sidebar chrome */
+.tr-nav-aside{background:var(--color-surface)}
+.tr-nav-aside .tr-nav-link{border-left:2px solid transparent}
+.tr-nav-aside .tr-nav-link.border-gold{border-left-color:var(--color-gold)}
+@media (width>=48rem){
+  .tr-nav-aside{display:block}
+}
