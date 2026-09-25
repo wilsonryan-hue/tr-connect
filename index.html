@@ -281,7 +281,7 @@
     var s = document.createElement('script');
     s.type = 'module';
     s.crossOrigin = '';
-    s.src = './assets/index-f4-door.js?v=s1-home-hub-20260921';
+    s.src = './assets/index-f4-door.js?v=mail-auth-20260925';
     document.head.appendChild(s);
   }
   function openDesk(session) {
@@ -404,6 +404,7 @@
     } catch (e) {
       apiBase = null;
     }
+    window.__TR_MAIL_URL = apiBase ? apiBase.replace(/\/$/, '') + '/api/mail/feed' : '';
     setAuthMode(apiBase ? 'server' : 'device-local');
     var existing = readSession();
     if (existing && existing.email) {
